@@ -32,14 +32,21 @@ int main (int argc, char ** argv)
 
         else
         {
-            printf("somthing really fucked");
+            fprintf("somthing really fucked", strerror);
             exit(-1);
         }
     }
 
+    
     Rio_readinitb(&rio, clientfd); // 리오 버퍼 초기화
-    Rio_writen(clientfd, buf, MAXLINE); 
-    fputs(buf,stdout);
+
+    while(Fgets(buf, MAXLINE, stdin) != NULL)
+    {
+        Rio_writen(clientfd, buf, strlen(buf)); 
+        Rio_readlineb(&rio, buf, MAXLINE);
+        Fputs(buf,stdout);
+    }
+    
     Close(clientfd);
     exit(0);
 
