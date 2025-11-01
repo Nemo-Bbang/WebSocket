@@ -30,15 +30,17 @@ int main (int argc, char ** argv)
     while(1)
     {
         client_len = sizeof(struct sockaddr_storage);
-        connfd = Accept(listenfd, (SA*)&client_addr, client_len );
+        connfd = Accept(listenfd, (SA*)&client_addr, &client_len );
         if (connfd< 0)
-            continue;
-        else break;
+        continue;
+
+        rio_readinitb(&rio, connfd);
+        rio_readlineb(&rio,userbuf, strlen(userbuf));
+        Fputs("ok bro\n", stdout);
+        Fputs(userbuf, stdout);
+        Close(connfd);
     }
-    rio_readinitb(&rio, connfd);
-    rio_readlineb(&rio,userbuf, strlen(userbuf));
-    Fputs(userbuf, stdout);
-    
+
     // echo(connfd);
-    Close(connfd);
+
 }
