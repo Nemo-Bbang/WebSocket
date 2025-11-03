@@ -1,14 +1,12 @@
 #include "../csapp.h"
 
-void echo(int);
-
 int main(int argc, char** argv) {
     int listenfd, connfd;
     char* port;
-    socklen_t client_len;
     struct sockaddr_storage client_addr;
+    socklen_t client_len;
     char client_hostname[MAXLINE], client_port[MAXLINE];
-    char userbuf[MAXLINE];
+    char userbuf[MAXLINE], resBuf[MAXLINE];
 
     rio_t rio;
 
@@ -33,21 +31,22 @@ int main(int argc, char** argv) {
         connfd = Accept(listenfd, (SA*)&client_addr, &client_len);
         if (connfd < 0) continue;
 
+        Fputs("connected!!\n", stdout);
+
         rio_readinitb(&rio, connfd);
-        rio_readlineb(&rio, userbuf, strlen(userbuf));
-        Fputs("ok bro\n", stdout);
-        while ((rio_readlineb(&rio, userbuf, strlen(userbuf))) != NULL)
+        while (rio_readlineb(&rio, userbuf, MAXBUF) != 0)
         {
-            rio_writen(connfd, userbuf, strlen(userbuf));
+            printf("==================== start of req: %s", userbuf);
+
+            strtok(userbuf, "\n");  // 마지막 줄바꿈 제거
+            sprintf(
+                resBuf,
+                "server: I got your message!\nserver: you said \"%s\"\n%s\n",
+                userbuf,
+                END_OF_SERVER_RES);  // Format into buf
+            rio_writen(connfd, resBuf, strlen(resBuf));
+            printf("==================== end of req: %s\n\n", userbuf);
         }
         Close(connfd);
     }
-
-    // echo(connfd);
-}
-
-void echo(int connect_fd) {
-    rio_t rio;
-
-    Rio_readinitb(&rio, connect_fd);
 }

@@ -41,10 +41,16 @@ int main(int argc, char** argv) {
     while (Fgets(buf, MAXLINE, stdin) != NULL)
     {
         Rio_writen(clientfd, buf, strlen(buf));
-        Rio_readlineb(&rio, buf, MAXLINE);
-        Fputs(buf, stdout);
+        Fputs("============================== start of res\n", stdout);
+
+        while (Rio_readlineb(&rio, buf, MAXLINE) > 0)
+        {
+            if (strcmp(buf, END_OF_SERVER_RES "\n") == 0)
+                break;  // 들을만큼 들었으면 이제 "요청"하러 나가기
+            Fputs(buf, stdout);
+        }
+        Fputs("============================== end of res\n\n", stdout);
     }
 
-    Close(clientfd);
     exit(0);
 }
